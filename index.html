@@ -1089,6 +1089,9 @@ body.in-detail.back-gone .top-back { opacity: 1; transform: none; pointer-events
 .cred-row li b { font-size: 15px; font-weight: 600; }
 .cred-row li span { font-size: 14px; color: var(--muted); min-width: 0; }
 .cred-row time { font-family: var(--font-display); font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+/* dates hug the right edge; a range breaks only after "~", never inside a year */
+.cred-row time { justify-self: end; text-align: right; }
+.cred-row li time span { display: inline-block; white-space: nowrap; font-size: inherit; color: inherit; }
 .about-cols .cred { margin-top: clamp(48px, 7vw, 88px); }
 /* duties as a quiet two-column table: area on the left, what was done on the right */
 /* rows are separated by space alone; the company rows above and below already carry the rules */
@@ -1743,6 +1746,8 @@ const LICENSES = [
   ['2012.05', 'ITQ 한글·엑셀 (국가공인)', '한국생산성본부']
 ];
 
+// "2014.03 ~ 2016.02" -> two unbreakable halves so the range can only wrap after "~"
+const credDate = d => d.split(' ~ ').map((t, i, a) => `<span>${t}${i < a.length - 1 ? ' ~' : ''}</span>`).join(' ');
 const img = n => 'img/p' + String(n).padStart(2, '0') + '.jpg';
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 // keep "기획·제작" style pairs on one line: word joiners on both sides of the middle dot
@@ -1874,8 +1879,8 @@ function homeView() {
         ${ABOUT.points.map(([t, d]) => `<div class="pr"><h3>${esc(t)}</h3><p>${esc(d)}</p></div>`).join('')}
       </div>
       <div class="cred" id="skills">
-        <div class="cred-row"><h3>Education</h3><ul>${EDUCATION.map(([d, n, o]) => `<li><b>${n}</b><span>${o}</span><time>${d}</time></li>`).join('')}</ul></div>
-        <div class="cred-row"><h3>License</h3><ul>${LICENSES.map(([d, n, o]) => `<li><b>${n}</b><span>${o}</span><time>${d}</time></li>`).join('')}</ul></div>
+        <div class="cred-row"><h3>Education</h3><ul>${EDUCATION.map(([d, n, o]) => `<li><b>${n}</b><span>${o}</span><time>${credDate(d)}</time></li>`).join('')}</ul></div>
+        <div class="cred-row"><h3>License</h3><ul>${LICENSES.map(([d, n, o]) => `<li><b>${n}</b><span>${o}</span><time>${credDate(d)}</time></li>`).join('')}</ul></div>
         <div class="cred-row"><h3>Skills</h3><ul class="cred-skills">${SKILL_GROUPS.map(([g, ts]) => `<li><b>${g}</b><span>${ts.join(' · ')}</span></li>`).join('')}</ul></div>
       </div>
     </div>
